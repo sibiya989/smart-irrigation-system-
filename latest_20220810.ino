@@ -18,15 +18,12 @@ const int sensorPin = 17;
 float sensorState;
 float lastState;
 
-//input pins
-float readD1; //water level sensor
-float readD2; // Rain sensor
-float readD3; //  Soil humidity sensor
 
 // output pins for decision making 
 int RainSensor = 13;
 int TankSensor = 16;
 int SoilHumidity = 15;
+int SoilTemperuture = 12;
 
 const char* ssid = "VodafoneMobileWiFi-01A925";  // Enter SSID here
 const char* password = "8551701125";  //Enter Password here
@@ -62,6 +59,7 @@ void setup()
   pinMode(RainSensor, OUTPUT);
   pinMode(TankSensor, OUTPUT);
   pinMode(SoilHumidity, OUTPUT);
+  pinMode(SoilTemperuture, OUTPUT);
 
 
  
@@ -82,6 +80,10 @@ void loop()
    Serial.print(" Soil_Humidity= ");
    Serial.println(Soil_Humidity());
 
+   Serial.println();
+   Serial.print(" Soil_Humidity= ");
+   Serial.println(Soil_Temperuture());
+   
    
     Firebase.pushFloat("Sensors/Rain_Sensor/value",float(Rain_Sensor()));
     Firebase.pushFloat("Sensors/Rain_Sensor/time_stamp", millis());
@@ -92,7 +94,9 @@ void loop()
     Firebase.pushFloat("Sensors/Tank_Sensor/value",float(Tank_Sensor()));
     Firebase.pushFloat("Sensors/Tank_Sensor/time_stamp", millis());
     
-
+    Firebase.pushFloat("Sensors/Soil_Temperuture/value",float(Soil_Temperuture()));
+    Firebase.pushFloat("Sensors/Soil_Temperuture/time_stamp", millis());
+    
 
   // Firebase.pushString("/sensors/temperature", String(temperature)); 
   // Firebase.pushString("/sensors/humidity", String(humidity));
@@ -104,25 +108,41 @@ void loop()
 
 int Rain_Sensor() 
 {
-    digitalWrite(TankSensor, LOW); // Turn D2 Off
-    digitalWrite(SoilHumidity, LOW); // Turn D2 Off
+
     digitalWrite(RainSensor, HIGH); // Turn D1 On
+     digitalWrite(TankSensor, LOW); // Turn D2 Off
+    digitalWrite(SoilHumidity, LOW); // Turn D2 Off
+    digitalWrite(SoilTemperuture, LOW); // Turn D2 Off
     delay(2000);
     return analogRead(sensorPin);
 }
  
 int Tank_Sensor() {
+   
+    digitalWrite(TankSensor, HIGH); // Turn D2 Off
     digitalWrite(RainSensor, LOW); //  Turn D1 On
     digitalWrite(SoilHumidity, LOW); // Turn D2 Off
-    digitalWrite(TankSensor, HIGH); // Turn D2 Off
+    digitalWrite(SoilTemperuture, LOW); // Turn D2 Off
     delay(2000);
     return analogRead(sensorPin);
 }
 
 int Soil_Humidity() {
+  
+    digitalWrite(SoilHumidity, HIGH); // Turn D2 Off
     digitalWrite(RainSensor, LOW); //  Turn D1 On
     digitalWrite(TankSensor, LOW); // Turn D2 Off
-    digitalWrite(SoilHumidity, HIGH); // Turn D2 Off
+    digitalWrite(SoilTemperuture, LOW); // Turn D2 Off
+    delay(2000);
+    return analogRead(sensorPin);
+}
+
+int Soil_Temperuture() {
+   
+    digitalWrite(SoilTemperuture, HIGH); // Turn D2 Off
+    digitalWrite(RainSensor, LOW); //  Turn D1 On
+    digitalWrite(TankSensor, LOW); // Turn D2 Off
+    digitalWrite(SoilHumidity, LOW); // Turn D2 Off
     delay(2000);
     return analogRead(sensorPin);
 }
