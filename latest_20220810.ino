@@ -67,23 +67,7 @@ void setup()
 void loop() 
 {
 
-   Serial.print("Rain_Sensor = ");
-   Serial.println(Rain_Sensor());
-
-   
-   Serial.println();
-   Serial.print(" Tank_Sensor= ");
-   Serial.println(Tank_Sensor());
  
-   
-   Serial.println();
-   Serial.print(" Soil_Humidity= ");
-   Serial.println(Soil_Humidity());
-
-   Serial.println();
-   Serial.print(" Soil_Humidity= ");
-   Serial.println(Soil_Temperuture());
-   
    
     Firebase.pushFloat("Sensors/Rain_Sensor/value",float(Rain_Sensor()));
     Firebase.pushFloat("Sensors/Rain_Sensor/time_stamp", millis());
@@ -98,12 +82,30 @@ void loop()
     Firebase.pushFloat("Sensors/Soil_Temperuture/time_stamp", millis());
     
 
-  // Firebase.pushString("/sensors/temperature", String(temperature)); 
-  // Firebase.pushString("/sensors/humidity", String(humidity));
-  // Firebase.pushString("/sensors/pressure", String(pressure)); 
-  // Firebase.pushString("/sensors/altitude", String(altitude));
 
-   
+   temperature = bme.readTemperature();
+   humidity = bme.readHumidity();
+   pressure = bme.readPressure() / 100.0F;
+   altitude = bme.readAltitude(SEALEVELPRESSURE_HPA);
+
+    Firebase.pushFloat("Sensors/Atmospheric_Temperuture/value",float(temperature));
+    Firebase.pushFloat("Sensors/Atmospheric_Temperuture/time_stamp", millis());
+
+
+    Firebase.pushFloat("Sensors/Atmospheric_humidity/value",float(humidity));
+    Firebase.pushFloat("Sensors/Atmospheric_humidity/time_stamp", millis());
+
+
+    
+    Firebase.pushFloat("Sensors/Atmospheric_pressure/value",float(pressure));
+    Firebase.pushFloat("Sensors/Atmospheric_pressure/time_stamp", millis());
+
+    
+    Firebase.pushFloat("Sensors/Atmospheric_altitude/value",float(altitude));
+    Firebase.pushFloat("Sensors/Atmospheric_altitude/time_stamp", millis());
+
+
+
 }
 
 int Rain_Sensor() 
@@ -147,11 +149,5 @@ int Soil_Temperuture() {
     return analogRead(sensorPin);
 }
 
-void handle_OnConnect() 
-{
-  temperature = bme.readTemperature();
-  humidity = bme.readHumidity();
-  pressure = bme.readPressure() / 100.0F;
-  altitude = bme.readAltitude(SEALEVELPRESSURE_HPA);
- 
-}
+
+
