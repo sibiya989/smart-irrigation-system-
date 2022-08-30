@@ -1,5 +1,4 @@
 
-
 #include <ESP8266WebServer.h>
 #include <Wire.h>
 //#include <Firebase_ESP_Client.h>
@@ -16,14 +15,16 @@ Adafruit_BME280 bme;
 float temperature, humidity, pressure, altitude;
 const int sensorPin = 17; 
 float sensorState;
-float lastState;
+
 
 
 // output pins for decision making 
 int RainSensor = 13;
-int TankSensor = 16;
+int TankSensor = 0                    ;
 int SoilHumidity = 15;
-int SoilTemperuture = 12;
+int WaterTankPump = 16;
+int IrrigationPump = 15;
+
 
 const char* ssid = "VodafoneMobileWiFi-01A925";  // Enter SSID here
 const char* password = "8551701125";  //Enter Password here
@@ -32,7 +33,7 @@ const char* password = "8551701125";  //Enter Password here
 void setup() 
 {
   Serial.begin(115200);
-  delay(2000);
+  delay(1000);
   
   bme.begin(0x76);   
 
@@ -45,8 +46,8 @@ void setup()
   //check wi-fi is connected to wi-fi network
   while (WiFi.status() != WL_CONNECTED)
   {
-  delay(2000);
-  Serial.print(" cannot connect to Wi-Fi");
+  delay(1000);
+  Serial.println(" cannot connect to Wi-Fi");
   }
   Serial.println("");
   Serial.println("WiFi connected..!");
@@ -59,17 +60,60 @@ void setup()
   pinMode(RainSensor, OUTPUT);
   pinMode(TankSensor, OUTPUT);
   pinMode(SoilHumidity, OUTPUT);
-  pinMode(SoilTemperuture, OUTPUT);
+  pinMode(WaterTankPump, OUTPUT);
+  pinMode(IrrigationPump, OUTPUT);
 
-
- 
 }
+
 void loop() 
 {
 
- 
+  temperature = bme.readTemperature();
+  humidity = bme.readHumidity();
+  pressure = bme.readPressure() / 100.0F;
+  altitude = bme.readAltitude(SEALEVELPRESSURE_HPA);
+
+  // wrap this in a while loop for a safety button.
+      // water tank is empty
+ if(Rain_Sensor() > 600 && Soil_Humidity() > 700 &&  temperature < 40 && Tank_Sensor() > 20 )
+  {
+
+    // send reason of not irrigating to firebase and user interface
+    Serial.println("irrigating due to low soil humidity and low Rain ");
+    digitalWrite(IrrigationPump, HIGH);
+  
+ }
+ //
+ else if(Rain_Sensor() > 600 && Soil_Humidity() > 700 &&  temperature < 40 && Tank_Sensor() < 20 )
+ {
+
+    // send reason of not irrigating to firebase and user interface
+    Serial.println("water tank is empty aand water pump set ON ");
+    digitalWrite(IrrigationPump, HIGH);
+  
+ }
+ else
+ {
+  
+    // send reason of not irrigating to firebase and user interface
+    Serial.println("Predicting high chances of Rain due to hight pressure and Humidity level");
+    digitalWrite(IrrigationPump, LOW);
+  
+ }
+
    
-    Firebase.pushFloat("Sensors/Rain_Sensor/value",float(Rain_Sensor()));
+   Serial.println(temperature);
+   Serial.println(Rain_Sensor());
+   Serial.println(Soil_Humidity());
+   Serial.println( Tank_Sensor());
+ 
+delay(2000);
+
+
+
+// send to Firebase 
+
+   Firebase.pushFloat("Sensors/Rain_Sensor/value",float(Rain_Sensor()));
     Firebase.pushFloat("Sensors/Rain_Sensor/time_stamp", millis());
 
     Firebase.pushFloat("Sensors/Soil_Humidity/value",float(Soil_Humidity()));
@@ -78,16 +122,7 @@ void loop()
     Firebase.pushFloat("Sensors/Tank_Sensor/value",float(Tank_Sensor()));
     Firebase.pushFloat("Sensors/Tank_Sensor/time_stamp", millis());
     
-    Firebase.pushFloat("Sensors/Soil_Temperuture/value",float(Soil_Temperuture()));
-    Firebase.pushFloat("Sensors/Soil_Temperuture/time_stamp", millis());
     
-
-
-   temperature = bme.readTemperature();
-   humidity = bme.readHumidity();
-   pressure = bme.readPressure() / 100.0F;
-   altitude = bme.readAltitude(SEALEVELPRESSURE_HPA);
-
     Firebase.pushFloat("Sensors/Atmospheric_Temperuture/value",float(temperature));
     Firebase.pushFloat("Sensors/Atmospheric_Temperuture/time_stamp", millis());
 
@@ -104,8 +139,6 @@ void loop()
     Firebase.pushFloat("Sensors/Atmospheric_altitude/value",float(altitude));
     Firebase.pushFloat("Sensors/Atmospheric_altitude/time_stamp", millis());
 
-
-
 }
 
 int Rain_Sensor() 
@@ -114,18 +147,8 @@ int Rain_Sensor()
     digitalWrite(RainSensor, HIGH); // Turn D1 On
      digitalWrite(TankSensor, LOW); // Turn D2 Off
     digitalWrite(SoilHumidity, LOW); // Turn D2 Off
-    digitalWrite(SoilTemperuture, LOW); // Turn D2 Off
-    delay(2000);
-    return analogRead(sensorPin);
-}
  
-int Tank_Sensor() {
-   
-    digitalWrite(TankSensor, HIGH); // Turn D2 Off
-    digitalWrite(RainSensor, LOW); //  Turn D1 On
-    digitalWrite(SoilHumidity, LOW); // Turn D2 Off
-    digitalWrite(SoilTemperuture, LOW); // Turn D2 Off
-    delay(2000);
+    delay(1000);
     return analogRead(sensorPin);
 }
 
@@ -134,20 +157,17 @@ int Soil_Humidity() {
     digitalWrite(SoilHumidity, HIGH); // Turn D2 Off
     digitalWrite(RainSensor, LOW); //  Turn D1 On
     digitalWrite(TankSensor, LOW); // Turn D2 Off
-    digitalWrite(SoilTemperuture, LOW); // Turn D2 Off
-    delay(2000);
-    return analogRead(sensorPin);
-}
-
-int Soil_Temperuture() {
    
-    digitalWrite(SoilTemperuture, HIGH); // Turn D2 Off
-    digitalWrite(RainSensor, LOW); //  Turn D1 On
-    digitalWrite(TankSensor, LOW); // Turn D2 Off
-    digitalWrite(SoilHumidity, LOW); // Turn D2 Off
-    delay(2000);
+    delay(1000);
     return analogRead(sensorPin);
 }
 
-
-
+int Tank_Sensor() {
+   
+    digitalWrite(TankSensor, HIGH); // Turn D2 Off
+    digitalWrite(RainSensor, LOW); //  Turn D1 On
+    digitalWrite(SoilHumidity, LOW); // Turn D2 Off
+   
+    delay(1000);
+    return analogRead(sensorPin);
+}
