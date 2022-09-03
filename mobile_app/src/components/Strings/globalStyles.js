@@ -92,6 +92,70 @@ const Styles = StyleSheet.create({
     modalBody: {
         flex: 1,
         
+    },
+    homeContainer:{
+        flex: 1,
+        height: '100%',
+        alignItems: 'center',
+    },
+    sensorCTA:{
+        width: 150,
+        height: 150,
+        backgroundColor: '#01877C',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginRight: 10,
+        marginBottom: 10,
+        borderRadius: 20
+    },
+    tasksCTA:{
+        width: 150,
+        height: 150,
+        backgroundColor: '#01877C',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 20
+    },
+    CTAText:{
+        color: "#ffffff",
+        fontSize: 22,
+    },
+    CTATextSub:{
+        color: "#ffffff",
+        fontSize: 15,
+    },
+    CTATextSubVal:{
+        color: "#ffffff",
+        fontSize: 18,
+    },
+    homeHeader: {
+        width: '100%',
+        height: 80,
+        backgroundColor: Colors.googleButton,
+        marginBottom: 40,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    headerText: {
+        color: '#ffffff',
+        fontSize: 18,
+        textTransform: 'uppercase'
+    },
+    sensorRow:{
+        flex: 1,
+        flexDirection: 'row',
+        marginBottom: 10,
+    },
+    controlBtn:{
+        height: 150,
+        width: '100%',
+        flexDirection: 'row',
+        justifyContent: 'space-evenly',
+        alignItems: 'flex-start',
+    },
+    controlBtnText: {
+        color: Colors.orange,
+        fontSize: 18,
     }
 })
 

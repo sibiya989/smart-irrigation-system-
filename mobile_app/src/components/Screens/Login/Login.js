@@ -1,6 +1,10 @@
-import { View, Text, ToastAndroid } from 'react-native';
+import { View, Text, ToastAndroid, ImageBackground, Image, TextInput } from 'react-native';
 import React, { useState } from 'react';
 import Styles from '../../Strings/globalStyles';
+import Colors from '../../Strings/Colors';
+import backgroundImage from '../../../assets/img/farmbg.jpeg';
+import userImage from '../../../assets/img/userlogin.png';
+import AppButton from '../../AppButton/AppButton';
 
 export default function Login() {
 
@@ -21,14 +25,14 @@ export default function Login() {
       <ImageBackground source={backgroundImage} resizeMode="cover" style={{flex: 1}}>
       <View style={Styles.loginTitleSections}>
         <Image style={{width:90, height:90}} source={userImage}/>
-        <Text style={Styles.loginTextStyles}>{Styles.text.loginTitle}</Text>
+        <Text style={Styles.loginTextStyles}>Login</Text>
       </View>
       <View style={Styles.formContainer}>
         <View style={Styles.loginForm}>
           <TextInput placeholder="Username" onChangeText={(value)=> setUsername(value)} keyboardType="email-address" style={Styles.inputField}/>
           <TextInput placeholder="Password" onChangeText={(value) => setPassword(value)} keyboardType="password" secureTextEntry={true} keyboardType="default" style={Styles.inputField}/>
-          <AppButton buttonText="Submit" customStyle={{backgroundColor: Styles.color.primary}} emailLogin = {loginWithEmail}/>
-          <AppButton customStyle={{marginTop: 10, backgroundColor: Styles.color.googleButton}} buttonText="Google" emailLogin = {loginWithGoogle}/>
+          <AppButton buttonText="Submit" customStyle={{backgroundColor: Colors.primary}} emailLogin = {loginWithEmail}/>
+          <AppButton customStyle={{marginTop: 10, backgroundColor: Colors.googleButton}} buttonText="Google" emailLogin = {loginWithGoogle}/>
         </View>
       </View>
       </ImageBackground>
